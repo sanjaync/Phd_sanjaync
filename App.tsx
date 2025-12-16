@@ -1,3 +1,4 @@
+
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
@@ -7,28 +8,45 @@ import React, { useState, useEffect } from 'react';
 import { EcoHeroScene, WaterBalanceScene } from './components/EcoScene';
 import { StrategyExplorer, SPACDiagram, DerivationBoard } from './components/Diagrams';
 import { Latex } from './components/Math';
-import { ArrowDown, Menu, X, Leaf, Droplets, Activity } from 'lucide-react';
-
-const AuthorCard = ({ name, role, delay }: { name: string, role: string, delay: string }) => {
-  return (
-    <div
-      className="flex flex-col group animate-fade-in-up items-center p-8 bg-white rounded-xl border border-stone-200 shadow-sm hover:shadow-md transition-all duration-300 w-full max-w-xs hover:border-nobel-gold/50"
-      style={{ animationDelay: delay }}
-    >
-      <h3 className="font-serif text-2xl text-stone-900 text-center mb-3">{name}</h3>
-      <div className="w-12 h-0.5 bg-earth-olive mb-4 opacity-60"></div>
-      <p className="text-xs text-stone-500 font-bold uppercase tracking-widest text-center leading-relaxed">{role}</p>
-    </div>
-  );
-};
+import { ArrowDown, Menu, X, Leaf, Droplets, Activity, Linkedin, PlayCircle, Presentation, Play, ExternalLink, Network, ArrowRight } from 'lucide-react';
 
 const App: React.FC = () => {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState<string>('');
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 50);
+    const handleScroll = () => {
+      // 1. Handle Navbar Background transparency
+      setScrolled(window.scrollY > 50);
+
+      // 2. Handle Active Section Highlighting (Scroll Spy)
+      const sections = ['intro', 'theory', 'strategies'];
+      // Use a trigger point roughly 1/3 down the viewport for natural reading highlight
+      const scrollPosition = window.scrollY + (window.innerHeight * 0.3);
+
+      let current = '';
+      
+      // Find the last section whose top is above the scroll position
+      for (const section of sections) {
+        const element = document.getElementById(section);
+        if (element) {
+          if (element.offsetTop <= scrollPosition) {
+            current = section;
+          }
+        }
+      }
+
+      // Special case: If we are at the very bottom, highlight the last item
+      if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 50) {
+        current = 'strategies';
+      }
+
+      setActiveSection(current);
+    };
+
     window.addEventListener('scroll', handleScroll);
+    handleScroll(); // Trigger once on mount to set initial state
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -47,6 +65,169 @@ const App: React.FC = () => {
       });
     }
   };
+
+  const getNavLinkClass = (sectionId: string) => {
+    const baseClass = "transition-all duration-300 cursor-pointer uppercase tracking-wider text-xs font-bold py-1 border-b-2";
+    const activeClass = "text-earth-olive border-earth-olive";
+    const inactiveClass = "text-stone-600 border-transparent hover:text-earth-olive hover:border-earth-olive/30";
+    
+    return `${baseClass} ${activeSection === sectionId ? activeClass : inactiveClass}`;
+  };
+
+  const getMobileNavLinkClass = (sectionId: string) => {
+    const baseClass = "transition-colors cursor-pointer uppercase";
+    const activeClass = "text-earth-olive font-bold";
+    const inactiveClass = "hover:text-earth-olive text-stone-800";
+    
+    return `${baseClass} ${activeSection === sectionId ? activeClass : inactiveClass}`;
+  };
+
+  // --- SCIENTIFIC KNOWLEDGE NETWORK DATA ---
+  
+  const lectures = {
+    eagleson: {
+      id: 'eagleson',
+      title: 'Foundations of Ecohydrology',
+      speaker: 'Prof. Peter S. Eagleson',
+      institution: 'MIT',
+      context: 'Tribute to a Pioneer',
+      abstract: 'The late Peter Eagleson established the paradigm of Ecohydrology, linking vegetation dynamics with landscape water availability.',
+      url: 'https://www.youtube.com/watch?v=HUH0EXZ_UHE',
+      thumbnail: 'https://img.youtube.com/vi/HUH0EXZ_UHE/hqdefault.jpg',
+      duration: 'Legacy',
+      tags: ['Foundations', 'Climate Coupling']
+    },
+    porporato: {
+      id: 'porporato',
+      title: 'Hydrology without Dimensions',
+      speaker: 'Prof. Amilcare Porporato',
+      institution: 'Princeton University',
+      context: 'Dalton Medal Lecture',
+      abstract: 'Exploring scaling, group theory, and "street-fighting hydrology" applied to partitioning and landscape evolution.',
+      url: 'https://www.youtube.com/watch?v=PmTYdor4vKo&t=329s',
+      thumbnail: 'https://img.youtube.com/vi/PmTYdor4vKo/hqdefault.jpg',
+      duration: '34:00',
+      tags: ['Scaling', 'Theory']
+    },
+    entekhabi: {
+      id: 'entekhabi',
+      title: 'SMAP: Land-Atmosphere Coupling',
+      speaker: 'Prof. Dara Entekhabi',
+      institution: 'MIT',
+      context: 'ESSIC Seminar',
+      abstract: 'How global soil moisture fields from NASA SMAP provide insights into water and energy balances.',
+      url: 'https://www.youtube.com/watch?v=eqI2djznJTM&t=809s',
+      thumbnail: 'https://img.youtube.com/vi/eqI2djznJTM/hqdefault.jpg',
+      duration: '58:00',
+      tags: ['Physics', 'SMAP']
+    },
+    wood: {
+      id: 'wood',
+      title: 'Grand Challenges in LSMs',
+      speaker: 'Prof. Eric F. Wood',
+      institution: 'Princeton University',
+      context: 'Symposium Lecture',
+      abstract: 'Evolution of land surface models and the need for hyper-resolution monitoring to manage water resources.',
+      url: 'https://www.youtube.com/watch?v=Wlq6oJCy54U&t=1002s',
+      thumbnail: 'https://img.youtube.com/vi/Wlq6oJCy54U/hqdefault.jpg',
+      duration: 'Lecture',
+      tags: ['Modeling', 'Global Scale']
+    },
+    vergopolan: {
+      id: 'vergopolan',
+      title: 'Hyper-Resolution: SMAP-HydroBlocks',
+      speaker: 'Dr. Noemi Vergopolan',
+      institution: 'Princeton University',
+      context: 'Research Highlight',
+      abstract: 'Combining microwave remote sensing, land surface modeling, and ML to obtain 30-m soil moisture estimates.',
+      url: 'https://www.youtube.com/watch?v=kw3VqFDLo_4&t=238s',
+      thumbnail: 'https://img.youtube.com/vi/kw3VqFDLo_4/hqdefault.jpg',
+      duration: 'Visualizer',
+      tags: ['Hyper-resolution', 'ML']
+    },
+    walker: {
+      id: 'walker',
+      title: 'Remote Sensing & Data Assimilation',
+      speaker: 'Prof. Jeffrey Walker',
+      institution: 'Monash University',
+      context: 'ESSIC Seminar & Field Experiments',
+      abstract: 'Improving spatial resolution through downscaling, data assimilation, and P-band satellite concepts for root-zone moisture.',
+      url: 'https://youtu.be/rHTF45OkYRs?si=E88zKTct3fT_JxoB',
+      thumbnail: 'https://img.youtube.com/vi/rHTF45OkYRs/hqdefault.jpg',
+      duration: '1:01:00',
+      tags: ['P-Band', 'Field Campaigns', 'Data Assimilation']
+    },
+    eswar: {
+      id: 'eswar',
+      title: 'RS Applications in Hydrology',
+      speaker: 'Prof. Eswar Rajasekaran',
+      institution: 'IIT Bombay',
+      context: 'Lecture Series',
+      abstract: 'Advanced applications of remote sensing in hydrology and thermal ET estimation.',
+      url: 'https://www.youtube.com/watch?v=hRF9oXOV18I&list=PLOzRYVm0a65cD8A9tJpU-vOoz1LDQ-UjD&index=65',
+      thumbnail: 'https://img.youtube.com/vi/hRF9oXOV18I/hqdefault.jpg',
+      duration: 'Lecture',
+      tags: ['ET', 'Thermal']
+    }
+  };
+
+  const domains = [
+    {
+      id: 'foundations',
+      title: 'Ecohydrology & Fundamental Theory',
+      description: 'Why land–water–vegetation systems behave the way they do.',
+      color: 'emerald', // Green
+      bg: 'bg-emerald-50/50',
+      border: 'border-emerald-200',
+      accent: 'bg-emerald-600',
+      text: 'text-emerald-800',
+      items: [lectures.eagleson, lectures.porporato]
+    },
+    {
+      id: 'interactions',
+      title: 'Soil Moisture & Land–Atmosphere',
+      description: 'Soil moisture physics + satellite observation concepts.',
+      color: 'sky', // Blue
+      bg: 'bg-sky-50/50',
+      border: 'border-sky-200',
+      accent: 'bg-sky-600',
+      text: 'text-sky-800',
+      items: [lectures.entekhabi]
+    },
+    {
+      id: 'modeling',
+      title: 'Land Surface Modeling',
+      description: 'Turning theory into Earth system models.',
+      color: 'orange', // Orange
+      bg: 'bg-orange-50/50',
+      border: 'border-orange-200',
+      accent: 'bg-orange-600',
+      text: 'text-orange-800',
+      items: [lectures.wood, lectures.vergopolan]
+    },
+    {
+      id: 'sensing',
+      title: 'Remote Sensing Observations',
+      description: 'Field campaigns, data assimilation, and satellite observations.',
+      color: 'purple', // Purple
+      bg: 'bg-purple-50/50',
+      border: 'border-purple-200',
+      accent: 'bg-purple-600',
+      text: 'text-purple-800',
+      items: [lectures.walker]
+    },
+    {
+      id: 'energy',
+      title: 'Evapotranspiration & Energy',
+      description: 'Water–energy partitioning and thermal remote sensing.',
+      color: 'amber', // Yellow
+      bg: 'bg-amber-50/50',
+      border: 'border-amber-200',
+      accent: 'bg-amber-600',
+      text: 'text-amber-800',
+      items: [lectures.eswar]
+    }
+  ];
 
   return (
     <div className="min-h-screen bg-[#F9F8F4] text-stone-800 selection:bg-earth-olive selection:text-white">
@@ -77,11 +258,10 @@ const App: React.FC = () => {
             </div>
           </div>
           
-          <div className="hidden md:flex items-center gap-8 text-sm font-medium tracking-wide text-stone-600">
-            <a href="#intro" onClick={scrollToSection('intro')} className="hover:text-earth-olive transition-colors cursor-pointer uppercase tracking-wider text-xs font-bold">The Problem</a>
-            <a href="#theory" onClick={scrollToSection('theory')} className="hover:text-earth-olive transition-colors cursor-pointer uppercase tracking-wider text-xs font-bold">Theory</a>
-            <a href="#strategies" onClick={scrollToSection('strategies')} className="hover:text-earth-olive transition-colors cursor-pointer uppercase tracking-wider text-xs font-bold">Strategies</a>
-            <a href="#authors" onClick={scrollToSection('authors')} className="hover:text-earth-olive transition-colors cursor-pointer uppercase tracking-wider text-xs font-bold">Authors</a>
+          <div className="hidden md:flex items-center gap-8 text-sm font-medium tracking-wide">
+            <a href="#intro" onClick={scrollToSection('intro')} className={getNavLinkClass('intro')}>The Problem</a>
+            <a href="#theory" onClick={scrollToSection('theory')} className={getNavLinkClass('theory')}>Theory</a>
+            <a href="#strategies" onClick={scrollToSection('strategies')} className={getNavLinkClass('strategies')}>Strategies</a>
             <a 
               href="https://doi.org/10.1016/j.advwatres.2023.104405" 
               target="_blank" 
@@ -101,10 +281,9 @@ const App: React.FC = () => {
       {/* Mobile Menu */}
       {menuOpen && (
         <div className="fixed inset-0 z-40 bg-[#F9F8F4] flex flex-col items-center justify-center gap-8 text-xl font-serif animate-fade-in">
-          <a href="#intro" onClick={scrollToSection('intro')} className="hover:text-earth-olive transition-colors cursor-pointer uppercase">The Problem</a>
-          <a href="#theory" onClick={scrollToSection('theory')} className="hover:text-earth-olive transition-colors cursor-pointer uppercase">Theory</a>
-          <a href="#strategies" onClick={scrollToSection('strategies')} className="hover:text-earth-olive transition-colors cursor-pointer uppercase">Strategies</a>
-          <a href="#authors" onClick={scrollToSection('authors')} className="hover:text-earth-olive transition-colors cursor-pointer uppercase">Authors</a>
+          <a href="#intro" onClick={scrollToSection('intro')} className={getMobileNavLinkClass('intro')}>The Problem</a>
+          <a href="#theory" onClick={scrollToSection('theory')} className={getMobileNavLinkClass('theory')}>Theory</a>
+          <a href="#strategies" onClick={scrollToSection('strategies')} className={getMobileNavLinkClass('strategies')}>Strategies</a>
         </div>
       )}
 
@@ -223,6 +402,162 @@ const App: React.FC = () => {
           </div>
         </section>
 
+        {/* --- SCIENTIFIC KNOWLEDGE NETWORK SECTION --- */}
+        <section className="py-24 bg-[#EBE9E4] border-b border-stone-200">
+          <div className="container mx-auto px-6 max-w-7xl">
+            
+            {/* Section Header */}
+            <div className="text-center mb-16">
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-stone-900/5 text-stone-600 text-xs font-bold tracking-widest uppercase rounded-full mb-6 border border-stone-200/20">
+                 <Network size={14} /> Knowledge Architecture
+              </div>
+              <h2 className="font-serif text-3xl md:text-5xl text-stone-900 mb-6">Scientific Context & Lineage</h2>
+              <p className="max-w-2xl mx-auto text-lg text-stone-600 font-light leading-relaxed">
+                Understanding land–atmosphere interactions through the integration of theory, models, and satellite observations.
+              </p>
+            </div>
+
+            {/* DOMAIN MASONRY LAYOUT */}
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 items-start">
+              
+              {/* Loop through Domains */}
+              {domains.map((domain) => (
+                <div key={domain.id} className={`rounded-2xl border ${domain.border} ${domain.bg} p-6 flex flex-col gap-6 shadow-sm`}>
+                  
+                  {/* Domain Header */}
+                  <div>
+                    <div className={`inline-block px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest text-white mb-3 ${domain.accent}`}>
+                      {domain.title}
+                    </div>
+                    <p className={`text-sm ${domain.text} opacity-90 leading-snug`}>
+                      {domain.description}
+                    </p>
+                  </div>
+
+                  {/* Videos/Cards in this Domain */}
+                  <div className="space-y-4">
+                    {domain.items.map((lecture) => (
+                      <div key={lecture.id} className="bg-white rounded-xl overflow-hidden shadow-sm border border-stone-200 hover:shadow-md transition-shadow group">
+                         {/* Thumbnail (Compact) */}
+                         <div className="relative aspect-video w-full bg-stone-200 cursor-pointer overflow-hidden" onClick={() => window.open(lecture.url, '_blank')}>
+                            <img src={lecture.thumbnail} alt={lecture.title} className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity" />
+                            <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+                               <PlayCircle className="text-white drop-shadow-md opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all" size={32} />
+                            </div>
+                         </div>
+                         
+                         {/* Details */}
+                         <div className="p-4">
+                           <h4 className="font-serif text-lg leading-tight text-stone-900 mb-1 group-hover:text-stone-600 transition-colors cursor-pointer" onClick={() => window.open(lecture.url, '_blank')}>
+                             {lecture.title}
+                           </h4>
+                           <div className="text-xs font-bold text-stone-500 mb-2 uppercase tracking-wide">
+                             {lecture.speaker} <span className="text-stone-300 mx-1">|</span> <span className="font-normal normal-case italic">{lecture.institution}</span>
+                           </div>
+                           
+                           {/* Dotted Lineage Indicator (Visual Connections) */}
+                           <div className={`mt-3 pt-3 border-t border-dashed ${domain.border} flex flex-col gap-2 text-[10px] ${domain.text} opacity-70`}>
+                              <div className="flex items-center gap-2">
+                                <div className={`w-1.5 h-1.5 rounded-full ${domain.accent}`}></div>
+                                <span>{lecture.tags.join(' • ')}</span>
+                              </div>
+
+                              {/* VISUAL LINEAGE CONNECTIONS (Cross-Domain) */}
+                              {lecture.id === 'entekhabi' && (
+                                <div className="mt-1 pt-2 border-t border-dotted border-emerald-300/50 flex items-center gap-2">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
+                                    <span className="text-[10px] text-emerald-700 font-semibold uppercase tracking-wide">
+                                        Legacy: Eagleson
+                                    </span>
+                                </div>
+                              )}
+                              
+                              {lecture.id === 'noemi' && (
+                                <div className="mt-1 pt-2 border-t border-dotted border-orange-300/50 flex items-center gap-2">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-orange-500"></div>
+                                    <span className="text-[10px] text-orange-700 font-semibold uppercase tracking-wide">
+                                        Supervision: Wood
+                                    </span>
+                                </div>
+                              )}
+                           </div>
+                         </div>
+                      </div>
+                    ))}
+                  </div>
+
+                </div>
+              ))}
+
+              {/* CENTRAL SYNTHESIS NODE (Black) */}
+              <div className="md:col-span-2 xl:col-span-1 rounded-2xl border border-stone-800 bg-stone-900 p-8 flex flex-col justify-center text-white shadow-xl relative overflow-hidden group">
+                 {/* Decorative background blur */}
+                 <div className="absolute top-0 right-0 w-64 h-64 bg-stone-700/30 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
+
+                 <div className="relative z-10">
+                    <div className="inline-block px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest bg-white text-stone-900 mb-6">
+                      Integration & Synthesis
+                    </div>
+                    
+                    <h3 className="font-serif text-3xl mb-4 text-white">
+                      Sanjay N C <span className="block text-lg text-stone-400 font-sans font-normal mt-2">The Unifying Framework</span>
+                    </h3>
+                    
+                    <p className="text-stone-400 mb-8 leading-relaxed text-sm">
+                      Synthesizing ecohydrologic theory, land surface modeling, remote sensing, and energy fluxes into a coherent understanding of global water strategies.
+                    </p>
+                    
+                    {/* SUPERVISION LINKS */}
+                    <div className="space-y-3 mb-8 bg-stone-800/50 p-4 rounded-xl border border-stone-700">
+                       <div className="text-[10px] uppercase tracking-widest text-stone-500 mb-2">Research Supervision</div>
+                       
+                       {/* Eswar Link (Yellow) */}
+                       <div className="flex items-center gap-3">
+                           <div className="w-2 h-2 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.6)]"></div>
+                           <div className="flex-1 border-b border-dotted border-amber-500/50"></div>
+                           <span className="text-xs font-bold text-amber-100 whitespace-nowrap">Prof. Eswar R.</span>
+                       </div>
+
+                       {/* Walker Link (Purple) */}
+                       <div className="flex items-center gap-3">
+                           <div className="w-2 h-2 rounded-full bg-purple-500 shadow-[0_0_8px_rgba(168,85,247,0.6)]"></div>
+                           <div className="flex-1 border-b border-dotted border-purple-500/50"></div>
+                           <span className="text-xs font-bold text-purple-100 whitespace-nowrap">Prof. Jeffrey Walker</span>
+                       </div>
+                    </div>
+
+                    <div className="space-y-4 mb-8">
+                       <div className="flex items-center gap-3 text-sm text-stone-300">
+                          <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
+                          <span>Theory & Scaling</span>
+                          <ArrowRight size={12} className="opacity-50" />
+                          <span className="font-bold text-white">Strategies</span>
+                       </div>
+                       <div className="flex items-center gap-3 text-sm text-stone-300">
+                          <div className="w-2 h-2 rounded-full bg-orange-500"></div>
+                          <span>Models (LSMs)</span>
+                          <ArrowRight size={12} className="opacity-50" />
+                          <span className="font-bold text-white">Validation</span>
+                       </div>
+                       <div className="flex items-center gap-3 text-sm text-stone-300">
+                          <div className="w-2 h-2 rounded-full bg-purple-500"></div>
+                          <span>Observations</span>
+                          <ArrowRight size={12} className="opacity-50" />
+                          <span className="font-bold text-white">Constraint</span>
+                       </div>
+                    </div>
+
+                    <a href="#strategies" onClick={scrollToSection('strategies')} className="inline-flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-earth-olive hover:text-white transition-colors cursor-pointer">
+                       View Research <ArrowDown size={14} />
+                    </a>
+                 </div>
+              </div>
+
+            </div>
+            
+          </div>
+        </section>
+
         {/* Strategies: Interactive */}
         <section id="strategies" className="py-24 md:py-32 bg-stone-900 text-stone-100 overflow-hidden relative">
           <div className="absolute top-0 left-0 w-full h-full opacity-20 pointer-events-none">
@@ -281,22 +616,6 @@ const App: React.FC = () => {
           </div>
         </section>
 
-        {/* Authors */}
-        <section id="authors" className="py-24 bg-[#EBEAE4] border-t border-stone-300">
-          <div className="container mx-auto px-6">
-            <div className="text-center mb-16">
-              <div className="inline-block mb-3 text-xs font-bold tracking-widest text-stone-500 uppercase">THE RESEARCHERS</div>
-              <h2 className="font-serif text-3xl md:text-5xl mb-4 text-stone-900">Contributors</h2>
-              <p className="text-stone-500 max-w-2xl mx-auto">Swedish University of Agricultural Sciences & Stockholm University</p>
-            </div>
-
-            <div className="flex flex-col md:flex-row gap-8 justify-center items-center flex-wrap">
-              <AuthorCard name="Maoya Bassiouni" role="SLU, Sweden & UC Berkeley" delay="0s" />
-              <AuthorCard name="Stefano Manzoni" role="Stockholm University" delay="0.1s" />
-              <AuthorCard name="Giulia Vico" role="SLU, Sweden" delay="0.2s" />
-            </div>
-          </div>
-        </section>
       </main>
 
       <footer className="bg-stone-900 text-stone-400 py-20">
@@ -310,10 +629,28 @@ const App: React.FC = () => {
             </div>
             <p className="text-sm opacity-60">Based on "Optimal plant water use strategies explain soil moisture variability" (2023)</p>
           </div>
-          <div className="flex gap-8 text-sm font-medium tracking-wide">
+          <div className="flex gap-8 text-sm font-medium tracking-wide items-center">
             <a href="https://doi.org/10.1016/j.advwatres.2023.104405" target="_blank" className="hover:text-white transition-colors">Original Paper</a>
+            
             <span className="opacity-20">|</span>
-            <span className="hover:text-white transition-colors cursor-default">Visualized with AI</span>
+
+            <a href="https://notebooklm.google.com/notebook/eadd648a-5761-4c0a-b441-e4a9bbafc9fc?artifactId=ee069c5e-351b-486a-8707-1e7e6f785103" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors flex items-center gap-2">
+               <Presentation size={18} />
+               <span>Slides</span>
+            </a>
+
+            <span className="opacity-20">|</span>
+
+            <a href="https://notebooklm.google.com/notebook/eadd648a-5761-4c0a-b441-e4a9bbafc9fc?artifactId=729265cb-53f0-45c6-904c-4d491be8de6e" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors flex items-center gap-2">
+               <PlayCircle size={18} />
+               <span>AI Deep Dive</span>
+            </a>
+
+            <span className="opacity-20">|</span>
+
+            <a href="https://linkedin.com/in/sanjay-n-c-007894102" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
+              <Linkedin size={20} />
+            </a>
           </div>
         </div>
       </footer>

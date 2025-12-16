@@ -98,6 +98,35 @@ declare global {
       animate: any;
       animateTransform: any;
       style: any;
+      filter: any;
+      feDropShadow: any;
+    }
+  }
+}
+
+// Augment React namespace specifically for newer TS/React versions where global JSX might not be used
+declare module 'react' {
+  namespace JSX {
+    interface IntrinsicElements {
+      mesh: any;
+      group: any;
+      ambientLight: any;
+      pointLight: any;
+      spotLight: any;
+      directionalLight: any;
+      meshStandardMaterial: any;
+      meshBasicMaterial: any;
+      meshPhysicalMaterial: any;
+      cylinderGeometry: any;
+      sphereGeometry: any;
+      boxGeometry: any;
+      planeGeometry: any;
+      torusGeometry: any;
+      instancedMesh: any;
+      fog: any;
+      color: any;
+      primitive: any;
+      object3D: any;
     }
   }
 }

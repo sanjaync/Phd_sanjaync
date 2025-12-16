@@ -1,3 +1,4 @@
+
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
@@ -5,42 +6,14 @@
 
 import React, { useRef, useMemo, useEffect, useState } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Float, Cylinder, Environment, Cloud, Sparkles } from "@react-three/drei";
+import { Float, Cylinder, Environment, Cloud, Sparkles, Line, Html } from "@react-three/drei";
 import * as THREE from "three";
 import "../types";
 
 // ------------------------------
-// 2D Balance Animation (SVG) — clean, centered, no title
+// 2D Balance Animation (SVG) — CSS Animation Optimized
 // ------------------------------
 const OptimalityBalance2D: React.FC = () => {
-  const [angle, setAngle] = useState(0);
-
-  useEffect(() => {
-    let raf = 0;
-    const start = performance.now();
-
-    const loop = (now: number) => {
-      const t = (now - start) / 1000;
-
-      // Gentle “weight-scale” rocking: ±5°
-      const a = Math.sin(t * 0.85) * (5 * Math.PI / 180);
-      setAngle(a);
-
-      raf = requestAnimationFrame(loop);
-    };
-
-    raf = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(raf);
-  }, []);
-
-  const deg = (angle * 180) / Math.PI;
-  const panCounterDeg = -deg;
-
-  // small gravity-like drop
-  const drop = 8;
-  const leftDrop = deg > 0 ? drop : 0;
-  const rightDrop = deg > 0 ? 0 : drop;
-
   return (
     <div className="w-full h-full flex items-center justify-center bg-[#F5F4F0]">
       <svg viewBox="0 0 700 420" className="w-full h-full">
@@ -71,6 +44,28 @@ const OptimalityBalance2D: React.FC = () => {
               paint-order: stroke fill;
               filter: url(#txtShadow);
             }
+            @keyframes beamRock {
+              0%, 100% { transform: rotate(0deg); }
+              25% { transform: rotate(5deg); }
+              75% { transform: rotate(-5deg); }
+            }
+            @keyframes panCounter {
+              0%, 100% { transform: rotate(0deg); }
+              25% { transform: rotate(-5deg); }
+              75% { transform: rotate(5deg); }
+            }
+            .beam-anim {
+              transform-origin: 350px 105px;
+              animation: beamRock 8s ease-in-out infinite;
+            }
+            .pan-left-anim {
+              transform-origin: 250px 252px;
+              animation: panCounter 8s ease-in-out infinite;
+            }
+            .pan-right-anim {
+              transform-origin: 450px 252px;
+              animation: panCounter 8s ease-in-out infinite;
+            }
           `}
         </style>
 
@@ -84,7 +79,7 @@ const OptimalityBalance2D: React.FC = () => {
           </g>
 
           {/* Beam group rotates about pivot */}
-          <g transform={`rotate(${deg} 350 105)`}>
+          <g className="beam-anim">
             {/* Beam */}
             <line x1="170" y1="150" x2="530" y2="150" stroke="#2F3B37" strokeWidth="14" strokeLinecap="round" />
 
@@ -97,47 +92,53 @@ const OptimalityBalance2D: React.FC = () => {
             <line x1="470" y1="150" x2="485" y2="245" stroke="#2F3B37" strokeWidth="6" strokeLinecap="round" />
 
             {/* LEFT PAN (blue) */}
-            <g transform={`translate(250 ${252 + leftDrop}) rotate(${panCounterDeg}) translate(-250 -${252 + leftDrop})`}>
-              <path
-                d="M185 245 Q250 305 315 245"
-                fill="none"
-                stroke="#1F6FB2"
-                strokeWidth="14"
-                strokeLinecap="round"
-              />
-              <path
-                d="M195 250 Q250 295 305 250 L305 292 Q250 332 195 292 Z"
-                fill="#1F6FB2"
-                opacity="0.96"
-              />
-              <text x="250" y="278" textAnchor="middle" fontSize="24" className="symbol">
-                ⟨T⟩
-              </text>
-              <text x="250" y="310" textAnchor="middle" fontSize="20" className="label">
-                Water uptake
-              </text>
+            {/* We translate the pan relative to the beam's coordinate space. 
+                The pan center is approx (250, 252). We apply counter rotation there. */}
+            <g transform="translate(0 0)"> 
+                <g className="pan-left-anim">
+                  <path
+                    d="M185 245 Q250 305 315 245"
+                    fill="none"
+                    stroke="#1F6FB2"
+                    strokeWidth="14"
+                    strokeLinecap="round"
+                  />
+                  <path
+                    d="M195 250 Q250 295 305 250 L305 292 Q250 332 195 292 Z"
+                    fill="#1F6FB2"
+                    opacity="0.96"
+                  />
+                  <text x="250" y="278" textAnchor="middle" fontSize="24" className="symbol">
+                    ⟨T⟩
+                  </text>
+                  <text x="250" y="310" textAnchor="middle" fontSize="20" className="label">
+                    Water uptake
+                  </text>
+                </g>
             </g>
 
             {/* RIGHT PAN (purple) */}
-            <g transform={`translate(450 ${252 + rightDrop}) rotate(${panCounterDeg}) translate(-450 -${252 + rightDrop})`}>
-              <path
-                d="M385 245 Q450 305 515 245"
-                fill="none"
-                stroke="#6B2D5C"
-                strokeWidth="14"
-                strokeLinecap="round"
-              />
-              <path
-                d="M395 250 Q450 295 505 250 L505 292 Q450 332 395 292 Z"
-                fill="#6B2D5C"
-                opacity="0.96"
-              />
-              <text x="450" y="278" textAnchor="middle" fontSize="24" className="symbol">
-                ⟨θ⟩
-              </text>
-              <text x="450" y="310" textAnchor="middle" fontSize="20" className="label">
-                Water stress
-              </text>
+            <g transform="translate(0 0)">
+                <g className="pan-right-anim">
+                  <path
+                    d="M385 245 Q450 305 515 245"
+                    fill="none"
+                    stroke="#6B2D5C"
+                    strokeWidth="14"
+                    strokeLinecap="round"
+                  />
+                  <path
+                    d="M395 250 Q450 295 505 250 L505 292 Q450 332 395 292 Z"
+                    fill="#6B2D5C"
+                    opacity="0.96"
+                  />
+                  <text x="450" y="278" textAnchor="middle" fontSize="24" className="symbol">
+                    ⟨θ⟩
+                  </text>
+                  <text x="450" y="310" textAnchor="middle" fontSize="20" className="label">
+                    Water stress
+                  </text>
+                </g>
             </g>
           </g>
         </g>
